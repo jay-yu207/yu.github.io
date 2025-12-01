@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情绪状态自测评估</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eaeaea;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .intro {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .question-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        .question-number {
+            color: #3498db;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            line-height: 1.5;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .option {
+            padding: 16px 20px;
+            border: 2px solid #e8e8e8;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+        
+        .option:hover {
+            background-color: #f0f7ff;
+            border-color: #c1e0ff;
+        }
+        
+        .option.selected {
+            background-color: #e3f2fd;
+            border-color: #3498db;
+            color: #2980b9;
+        }
+        
+        .option-value {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        .option-desc {
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #prevBtn {
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+        }
+        
+        #prevBtn:hover:not(:disabled) {
+            background-color: #d5dbdb;
+        }
+        
+        #prevBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        #nextBtn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        #nextBtn:hover {
+            background-color: #2980b9;
+        }
+        
+        #submitBtn {
+            background-color: #2ecc71;
+            color: white;
+            display: none;
+        }
+        
+        #submitBtn:hover {
+            background-color: #27ae60;
+        }
+        
+        #submitBtn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .progress-container {
+            margin-bottom: 25px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            text-align: right;
+            margin-top: 8px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .result-container {
+            display: none;
+            padding: 30px;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .result-title {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .score-display {
+            font-size: 60px;
+            font-weight: 700;
+            color: #3498db;
+            margin: 20px 0;
+        }
+        
+        .stage-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 25px 0 15px;
+            padding: 12px 20px;
+            border-radius: 8px;
+        }
+        
+        .stage-description {
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .stage-section {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .stage-section h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .stage-list {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .stage-list li {
+            margin-bottom: 8px;
+        }
+        
+        .restart-btn {
+            background-color: #3498db;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        .restart-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            background-color: #fdeaea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .disclaimer {
+            font-size: 13px;
+            color: #95a5a6;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .question-text {
+                font-size: 17px;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>情绪状态自测评估</h1>
+            <p class="intro">本测试包含27个问题，将帮助您了解当前的情绪状态。请根据最近两周的情况选择最符合的选项。</p>
+        </header>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0/27</div>
+        </div>
+        
+        <div id="questionContainer">
+            <!-- 问题将通过JavaScript动态插入 -->
+        </div>
+        
+        <div class="button-container">
+            <button id="prevBtn" disabled>上一题</button>
+            <button id="nextBtn">下一题</button>
+            <button id="submitBtn" disabled>查看结果</button>
+        </div>
+        
+        <div id="resultContainer" class="result-container">
+            <!-- 结果将通过JavaScript动态插入 -->
+        </div>
+        
+        <div class="disclaimer">
+            <p>重要提示：本测试仅为自我评估工具，不能替代专业医疗诊断。如果您的结果显示有情绪困扰，建议咨询心理咨询师或精神科医生。</p>
+        </div>
+    </div>
+
+    <script>
+        // 情绪测试数据
+        const questions = [
+            { text: "持续的情绪低落、感到悲伤、空虚、无助，这种情绪几乎每天大部分时间都存在。", id: 1 },
+            { text: "兴趣减退或丧失、对以前喜爱的活动（如爱好、社交、工作）失去兴趣，无法从中获得快乐。", id: 2 },
+            { text: "过度焦虑或担忧、对很多事情感到难以控制的、过度的担心和紧张，经常感到心神不宁。", id: 3 },
+            { text: "易怒躁动、情绪变得非常急躁，容易被小事激怒，对家人、朋友或同事失去耐心。", id: 4 },
+            { text: "情绪麻木、感觉不到快乐，也感觉不到悲伤，仿佛与外界隔着一层膜，情感反应迟钝。", id: 5 },
+            { text: "无价值感或过度内疚、对自己产生不切实际的负面评价，过分自责，感觉自己一无是处或拖累他人。", id: 6 },
+            { text: "绝望感：对未来感到悲观，认为情况永远不会好转，看不到任何希望。", id: 7 },
+            { text: "空虚感：内心感到空洞，不知道自己想要什么，生活缺乏意义和目标。", id: 8 },
+            { text: "注意力难以集中：无法专注地工作、学习或完成简单任务，容易分心，记忆力下降。", id: 9 },
+            { text: "优柔寡断：即使是小事（如穿什么、吃什么）也变得难以做出决定。", id: 10 },
+            { text: "思维迟缓或混乱：感觉头脑不清醒，思维速度变慢，或者想法杂乱无章。", id: 11 },
+            { text: "负面思维泛滥：总是看到事情不好的一面，难以看到积极因素，陷入自我批评和灾难化的想象中。", id: 12 },
+            { text: "社交退缩：不愿与人交往，回避朋友、家庭聚会和社交活动，喜欢独处。", id: 13 },
+            { text: "言语或行动迟缓：说话变慢，回答问题需要很长时间，或动作变得拖沓。", id: 14 },
+            { text: "生活动力丧失：难以开始或完成日常任务，如洗漱、做家务、上班。", id: 15 },
+            { text: "睡眠紊乱：入睡困难+早醒（比平时早醒≥2小时），或每日睡眠超过12小时仍感疲惫。", id: 16 },
+            { text: "慢性疼痛：头痛、颈肩痛、胃肠不适等，医学检查无明确器质性病变。", id: 17 },
+            { text: "食欲或体重显著变化：食欲不振导致体重明显下降，或通过暴食来寻求安慰导致体重增加。", id: 18 },
+            { text: "精力丧失与疲劳：持续感到异常疲劳，即使经过休息也无法缓解，浑身乏力。", id: 19 },
+            { text: "感官异常：非器质性的视物模糊、耳鸣、肢体麻木或蚁走感。", id: 20 },
+            { text: "成瘾代偿：通过酗酒、暴食、过度购物等方式短暂缓解情绪痛苦。", id: 21 },
+            { text: "自我价值感崩塌：持续自我否定，如\"我是彻底的失败者\"，夸大自身缺陷。", id: 22 },
+            { text: "灾难化思维：将小事放大为不可逆转的灾难（例：\"一次失误=职业生涯终结\"）。", id: 23 },
+            { text: "思维反刍：反复纠缠于负面回忆或担忧，形成\"无法摆脱的思维漩涡\"。", id: 24 },
+            { text: "成瘾代偿：通过酗酒、暴食、过度购物等方式短暂缓解情绪痛苦。", id: 25 },
+            { text: "兴趣活动终止：完全放弃既往维持的爱好、运动或自我提升行为。", id: 26 },
+            { text: "自主神经紊乱：无缘由心悸、胸闷、手抖、出汗（非运动或高温环境下）。", id: 27 }
+        ];
+
+        // 选项数据
+        const options = [
+            { value: 4, label: "经常如此", desc: "几乎每天或大部分时间" },
+            { value: 3, label: "偶尔如此", desc: "每周几次" },
+            { value: 2, label: "有过几次", desc: "过去两周内有几次" },
+            { value: 1, label: "从未有过", desc: "完全没有" }
+        ];
+
+        // 结果评估数据
+        const resultStages = [
+            {
+                name: "情绪波动期（功能基本正常）",
+                scoreRange: { min: 27, max: 45 },
+                color: "#3498db",
+                description: "这个阶段是每个人都会经历的，情绪波动在正常范围内，但频率或强度可能比平时稍高。",
+                characteristics: "核心特征：情绪反应与压力源基本相符，个人能通过自我调节恢复，社会功能（工作、学习、社交）保持基本正常。",
+                symptoms: [
+                    "短期（数日内）的情绪低落、焦虑或烦躁",
+                    "遇到具体事情时失眠、食欲波动",
+                    "精力下降，但休息后可缓解",
+                    "能主动寻求社交支持或通过兴趣爱好转移注意力"
+                ],
+                recommendations: [
+                    "保证充足睡眠、均衡营养、规律运动",
+                    "学习放松技巧（如深呼吸、冥想）、进行时间管理",
+                    "与亲友倾诉，获取情感慰藉",
+                    "了解情绪健康知识，将其视为正常心理波动"
+                ]
+            },
+            {
+                name: "情绪困扰期（功能开始受损）",
+                scoreRange: { min: 46, max: 65 },
+                color: "#f39c12",
+                description: "情绪反应开始超出情境的正常范围，持续时间延长，并开始对日常生活造成可察觉的干扰。",
+                characteristics: "核心特征：负面情绪持续较久（如两周以上），强度超出常态，开始对日常生活造成明确干扰。",
+                symptoms: [
+                    "持续的情绪低落、兴趣减退或易怒",
+                    "睡眠障碍（入睡难、早醒）或食欲/体重明显变化",
+                    "注意力不集中，做决定困难，工作效率下降",
+                    "主动回避部分社交活动，感到孤独但难以主动联系他人",
+                    "出现'自己没用'等消极自我评价"
+                ],
+                recommendations: [
+                    "建议咨询心理咨询师或心理治疗师，进行系统评估",
+                    "开始短程治疗（如认知行为疗法），识别和调整负面思维与行为模式",
+                    "在专业人士指导下，建立更规律的健康作息与活动安排",
+                    "向值得信赖的家人或朋友说明自己的情况，获取理解与支持"
+                ]
+            },
+            {
+                name: "情绪障碍前期（功能显著受损期）",
+                scoreRange: { min: 66, max: 85 },
+                color: "#e74c3c",
+                description: "核心特征：症状达到临床诊断标准（如抑郁症、焦虑症），痛苦感强烈，社会功能严重受损。",
+                characteristics: "核心特征：症状达到临床诊断标准（如抑郁症、焦虑症），痛苦感强烈，社会功能严重受损。",
+                symptoms: [
+                    "几乎每天大部分时间情绪低落或兴趣丧失",
+                    "严重的睡眠和饮食紊乱，体重显著变化",
+                    "持续的极度疲劳、精力枯竭感",
+                    "思维迟缓，记忆力、思考能力明显下降",
+                    "强烈的无价值感、过度内疚或绝望感",
+                    "反复出现关于死亡或自杀的念头（需立即关注）"
+                ],
+                recommendations: [
+                    "就诊于精神科医生是此阶段的核心步骤",
+                    "医生可能会开具抗抑郁、抗焦虑等药物，以纠正神经递质失衡，有效缓解核心症状",
+                    "在药物起效稳定情绪的基础上，结合长期、深入的心理治疗",
+                    "建立由医生、治疗师、家人和朋友组成的支持网络，制定全面的康复计划"
+                ]
+            },
+            {
+                name: "严重衰退期（功能严重崩溃）",
+                scoreRange: { min: 86, max: 108 },
+                color: "#c0392b",
+                description: "这是最严重的阶段，个体可能完全无法行使社会功能，并处于直接危险中。",
+                characteristics: "核心表现：无法完成基本生活自理（如洗澡、吃饭）。出现精神病性症状，如幻觉、妄想（如坚信自己被监视或患有绝症）。存在明确的、有计划的自杀或自伤行为。或出现因极度焦虑激越而产生的伤人风险。",
+                symptoms: [
+                    "与现实脱离",
+                    "言语和行为紊乱",
+                    "完全丧失求生欲望",
+                    "可能伴有极端的退缩或激越"
+                ],
+                recommendations: [
+                    "这是医疗急症。必须立即拨打急救电话或前往医院急诊室",
+                    "通常需要住院以确保安全，进行密集的药物调整和监护",
+                    "包括药物治疗、电休克治疗等强有力的医学手段",
+                    "度过急性期后，需要制定长期的、多方位的康复和预防复发计划"
+                ]
+            }
+        ];
+
+        // 当前问题索引
+        let currentQuestionIndex = 0;
+        // 用户答案数组
+        let userAnswers = new Array(questions.length).fill(0);
+        // 总分数
+        let totalScore = 0;
+
+        // DOM元素
+        const questionContainer = document.getElementById('questionContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // 初始化测试
+        function initTest() {
+            showQuestion(currentQuestionIndex);
+            updateProgress();
+            updateButtonStates();
+        }
+
+        // 显示指定索引的问题
+        function showQuestion(index) {
+            // 清空容器
+            questionContainer.innerHTML = '';
+            
+            // 创建问题元素
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question-container active';
+            
+            // 添加问题编号
+            const questionNumber = document.createElement('div');
+            questionNumber.className = 'question-number';
+            questionNumber.textContent = `问题 ${index + 1} / ${questions.length}`;
+            questionElement.appendChild(questionNumber);
+            
+            // 添加问题文本
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = questions[index].text;
+            questionElement.appendChild(questionText);
+            
+            // 添加选项
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options';
+            
+            options.forEach((option, optionIndex) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = `option ${userAnswers[index] === option.value ? 'selected' : ''}`;
+                optionElement.dataset.value = option.value;
+                
+                const optionValue = document.createElement('div');
+                optionValue.className = 'option-value';
+                optionValue.textContent = option.label;
+                
+                const optionDesc = document.createElement('div');
+                optionDesc.className = 'option-desc';
+                optionDesc.textContent = option.desc;
+                
+                optionElement.appendChild(optionValue);
+                optionElement.appendChild(optionDesc);
+                
+                // 添加点击事件
+                optionElement.addEventListener('click', () => {
+                    selectOption(index, option.value);
+                });
+                
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            questionElement.appendChild(optionsContainer);
+            questionContainer.appendChild(questionElement);
+            
+            // 更新按钮状态
+            updateButtonStates();
+        }
+
+        // 选择选项
+        function selectOption(questionIndex, value) {
+            userAnswers[questionIndex] = value;
+            
+            // 更新当前显示的问题选项状态
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                const optionValue = parseInt(option.dataset.value);
+                if (optionValue === value) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+            
+            // 隐藏错误消息
+            errorMessage.style.display = 'none';
+            
+            // 更新按钮状态
+            updateButtonStates();
+        }
+
+        // 下一个问题
+        function nextQuestion() {
+            // 检查当前问题是否已回答
+            if (userAnswers[currentQuestionIndex] === 0) {
+                showError("请先回答当前问题");
+                return;
+            }
+            
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion(currentQuestionIndex);
+                updateProgress();
+            }
+        }
+
+        // 上一个问题
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion(currentQuestionIndex);
+                updateProgress();
+            }
+        }
+
+        // 显示错误消息
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // 更新按钮状态
+        function updateButtonStates() {
+            // 更新上一题按钮
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            // 更新下一题/提交按钮
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+                
+                // 检查是否所有问题都已回答
+                const allAnswered = userAnswers.every(answer => answer !== 0);
+                submitBtn.disabled = !allAnswered;
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+                
+                // 检查当前问题是否已回答
+                nextBtn.disabled = userAnswers[currentQuestionIndex] === 0;
+            }
+        }
+
+        // 更新进度条
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressFill.style.width = `${progress}%`;
+            progressText.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
+        }
+
+        // 提交测试
+        function submitTest() {
+            // 检查是否所有问题都已回答
+            const unansweredQuestions = userAnswers.filter(answer => answer === 0).length;
+            if (unansweredQuestions > 0) {
+                showError(`您还有 ${unansweredQuestions} 个问题未回答，请完成所有问题后再提交。`);
+                return;
+            }
+            
+            // 计算总分
+            totalScore = userAnswers.reduce((sum, answer) => sum + answer, 0);
+            
+            // 显示结果
+            showResult(totalScore);
+        }
+
+        // 显示结果
+        function showResult(score) {
+            // 隐藏问题容器和按钮
+            questionContainer.style.display = 'none';
+            document.querySelector('.button-container').style.display = 'none';
+            document.querySelector('.progress-container').style.display = 'none';
+            errorMessage.style.display = 'none';
+            
+            // 确定结果阶段
+            let resultStage = null;
+            for (const stage of resultStages) {
+                if (score >= stage.scoreRange.min && score <= stage.scoreRange.max) {
+                    resultStage = stage;
+                    break;
+                }
+            }
+            
+            // 如果没有匹配的阶段（理论上不应该发生），显示错误
+            if (!resultStage) {
+                resultStage = resultStages[0]; // 默认显示第一个阶段
+            }
+            
+            // 创建结果元素
+            resultContainer.innerHTML = '';
+            resultContainer.style.display = 'block';
+            
+            // 添加总分
+            const scoreDisplay = document.createElement('div');
+            scoreDisplay.className = 'score-display';
+            scoreDisplay.textContent = score;
+            resultContainer.appendChild(scoreDisplay);
+            
+            // 添加阶段名称
+            const stageName = document.createElement('div');
+            stageName.className = 'stage-name';
+            stageName.textContent = resultStage.name;
+            stageName.style.color = resultStage.color;
+            stageName.style.backgroundColor = `${resultStage.color}15`;
+            resultContainer.appendChild(stageName);
+            
+            // 添加阶段描述
+            const stageDescription = document.createElement('div');
+            stageDescription.className = 'stage-description';
+            stageDescription.innerHTML = `<p><strong>描述：</strong>${resultStage.description}</p>`;
+            resultContainer.appendChild(stageDescription);
+            
+            // 添加核心特征
+            const characteristicsSection = document.createElement('div');
+            characteristicsSection.className = 'stage-section';
+            characteristicsSection.innerHTML = `
+                <h3>核心特征</h3>
+                <p>${resultStage.characteristics}</p>
+            `;
+            resultContainer.appendChild(characteristicsSection);
+            
+            // 添加主要表现
+            const symptomsSection = document.createElement('div');
+            symptomsSection.className = 'stage-section';
+            symptomsSection.innerHTML = `
+                <h3>主要表现与症状</h3>
+                <ul class="stage-list">
+                    ${resultStage.symptoms.map(symptom => `<li>${symptom}</li>`).join('')}
+                </ul>
+            `;
+            resultContainer.appendChild(symptomsSection);
+            
+            // 添加建议
+            const recommendationsSection = document.createElement('div');
+            recommendationsSection.className = 'stage-section';
+            recommendationsSection.innerHTML = `
+                <h3>治疗与缓解方向</h3>
+                <ul class="stage-list">
+                    ${resultStage.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                </ul>
+            `;
+            resultContainer.appendChild(recommendationsSection);
+            
+            // 添加重新测试按钮
+            const restartBtn = document.createElement('button');
+            restartBtn.className = 'restart-btn';
+            restartBtn.textContent = '重新测试';
+            restartBtn.addEventListener('click', restartTest);
+            resultContainer.appendChild(restartBtn);
+            
+            // 如果是严重阶段，添加紧急提示
+            if (score >= 86) {
+                const emergencyAlert = document.createElement('div');
+                emergencyAlert.className = 'stage-section';
+                emergencyAlert.style.backgroundColor = '#ffebee';
+                emergencyAlert.style.padding = '15px';
+                emergencyAlert.style.borderRadius = '8px';
+                emergencyAlert.style.borderLeft = '5px solid #c0392b';
+                emergencyAlert.innerHTML = `
+                    <h3 style="color: #c0392b;">⚠️ 重要提示</h3>
+                    <p>您的测试结果显示您可能处于情绪严重困扰期。请立即寻求专业帮助：</p>
+                    <ul class="stage-list">
+                        <li>立即联系心理咨询师或精神科医生</li>
+                        <li>拨打心理援助热线（如：全国心理援助热线 400-161-9995）</li>
+                        <li>告诉亲友您的情况，获取支持</li>
+                        <li>如有自伤或伤人想法，请立即拨打急救电话</li>
+                    </ul>
+                `;
+                resultContainer.insertBefore(emergencyAlert, restartBtn);
+            }
+        }
+
+        // 重新开始测试
+        function restartTest() {
+            // 重置所有数据
+            currentQuestionIndex = 0;
+            userAnswers = new Array(questions.length).fill(0);
+            totalScore = 0;
+            
+            // 显示测试界面
+            questionContainer.style.display = 'block';
+            document.querySelector('.button-container').style.display = 'flex';
+            document.querySelector('.progress-container').style.display = 'block';
+            resultContainer.style.display = 'none';
+            errorMessage.style.display = 'none';
+            
+            // 重新初始化测试
+            initTest();
+        }
+
+        // 事件监听
+        prevBtn.addEventListener('click', prevQuestion);
+        nextBtn.addEventListener('click', nextQuestion);
+        submitBtn.addEventListener('click', submitTest);
+
+        // 页面加载时初始化测试
+        window.addEventListener('DOMContentLoaded', initTest);
+    </script>
+</body>
+</html>
